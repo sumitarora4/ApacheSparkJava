@@ -1,6 +1,7 @@
 package com.virtualpairprogrammers;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -51,7 +52,21 @@ public class KeywordRankingMain {
 		// sorting keys in descending order
 		JavaPairRDD<Long, String> sorted = switched.sortByKey(false);
 		
-		sorted.take(10).forEach(System.out:: println);
+		System.out.println("no. of partitions="+sorted.getNumPartitions());
+		
+		// store result into single partition but this is not the best approach
+//		sorted = sorted.coalesce(1);
+		
+//		sorted.foreach(f -> System.out.println(f));  // after coalesce this will store result in single partition and then foreach give correct result
+		
+//		sorted.foreach(System.out::println);  // this will give Exception in thread "main" org.apache.spark.SparkException: Task not serializable... need to check
+		
+//		sorted.take(10000).forEach(System.out:: println); // this will work 
+		
+		List<Tuple2<Long, String>> listResult = sorted.collect();
+		
+		listResult.forEach(System.out:: println);
+		
 		
 		sc.close();
 	}
